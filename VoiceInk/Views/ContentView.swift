@@ -14,7 +14,9 @@ enum ViewType: String, CaseIterable, Identifiable {
     case audioInput = "Audio Input"
     case dictionary = "Dictionary"
     case settings = "Settings"
+    #if !LOCAL_BUILD
     case license = "VoiceInk Pro"
+    #endif
 
     var id: String { rawValue }
 
@@ -30,7 +32,9 @@ enum ViewType: String, CaseIterable, Identifiable {
         case .audioInput: return "mic.fill"
         case .dictionary: return "character.book.closed.fill"
         case .settings: return "gearshape.fill"
+        #if !LOCAL_BUILD
         case .license: return "checkmark.seal.fill"
+        #endif
         }
     }
 }
@@ -60,8 +64,10 @@ struct ContentView: View {
     @EnvironmentObject private var hotkeyManager: HotkeyManager
     @AppStorage("powerModeUIFlag") private var powerModeUIFlag = false
     @State private var selectedView: ViewType? = .metrics
+    #if !LOCAL_BUILD
     let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
     @StateObject private var licenseViewModel = LicenseViewModel()
+    #endif
 
     private var visibleViewTypes: [ViewType] {
         ViewType.allCases.filter { viewType in
@@ -89,6 +95,7 @@ struct ContentView: View {
                         Text("VoiceInk")
                             .font(.system(size: 14, weight: .semibold))
 
+                        #if !LOCAL_BUILD
                         if case .licensed = licenseViewModel.licenseState {
                             Text("PRO")
                                 .font(.system(size: 9, weight: .heavy))
@@ -98,6 +105,7 @@ struct ContentView: View {
                                 .background(Color.blue)
                                 .cornerRadius(4)
                         }
+                        #endif
 
                         Spacer()
                     }
@@ -151,8 +159,10 @@ struct ContentView: View {
                     selectedView = .settings
                 case "AI Models":
                     selectedView = .models
+                #if !LOCAL_BUILD
                 case "VoiceInk Pro":
                     selectedView = .license
+                #endif
                 case "History":
                     HistoryWindowController.shared.showHistoryWindow(
                         modelContainer: modelContext.container,
@@ -196,8 +206,10 @@ struct ContentView: View {
         case .settings:
             SettingsView()
                 .environmentObject(whisperState)
+        #if !LOCAL_BUILD
         case .license:
             LicenseManagementView()
+        #endif
         case .permissions:
             PermissionsView()
         }

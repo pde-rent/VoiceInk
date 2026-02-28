@@ -5,7 +5,9 @@ import LaunchAtLogin
 import AVFoundation
 
 struct SettingsView: View {
+    #if !LOCAL_BUILD
     @EnvironmentObject private var updaterViewModel: UpdaterViewModel
+    #endif
     @EnvironmentObject private var menuBarManager: MenuBarManager
     @EnvironmentObject private var hotkeyManager: HotkeyManager
     @EnvironmentObject private var whisperState: WhisperState
@@ -15,7 +17,9 @@ struct SettingsView: View {
     @ObservedObject private var mediaController = MediaController.shared
     @ObservedObject private var playbackController = PlaybackController.shared
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = true
+    #if !LOCAL_BUILD
     @AppStorage("autoUpdateCheck") private var autoUpdateCheck = true
+    #endif
     @AppStorage("enableAnnouncements") private var enableAnnouncements = true
     @AppStorage("restoreClipboardAfterPaste") private var restoreClipboardAfterPaste = true
     @AppStorage("clipboardRestoreDelay") private var clipboardRestoreDelay = 2.0
@@ -207,10 +211,12 @@ struct SettingsView: View {
 
                 LaunchAtLogin.Toggle("Launch at Login")
 
+                #if !LOCAL_BUILD
                 Toggle("Auto-check Updates", isOn: $autoUpdateCheck)
                     .onChange(of: autoUpdateCheck) { _, newValue in
                         updaterViewModel.toggleAutoUpdates(newValue)
                     }
+                #endif
 
                 Toggle("Show Announcements", isOn: $enableAnnouncements)
                     .onChange(of: enableAnnouncements) { _, newValue in
@@ -222,10 +228,12 @@ struct SettingsView: View {
                     }
 
                 HStack {
+                    #if !LOCAL_BUILD
                     Button("Check for Updates") {
                         updaterViewModel.checkForUpdates()
                     }
                     .disabled(!updaterViewModel.canCheckForUpdates)
+                    #endif
 
                     Button("Reset Onboarding") {
                         showResetOnboardingAlert = true

@@ -88,20 +88,26 @@ import Foundation
     ]
     
     static var models: [any TranscriptionModel] {
+        #if arch(arm64)
         return predefinedModels + CustomModelManager.shared.customModels
+        #else
+        // Apple Speech (SpeechAnalyzer) requires Apple Silicon — hide on Intel
+        return predefinedModels.filter { !($0 is NativeAppleModel) } + CustomModelManager.shared.customModels
+        #endif
     }
     
     private static let predefinedModels: [any TranscriptionModel] = [
-        // Native Apple Model
-        NativeAppleModel(
-            name: "apple-speech",
-            displayName: "Apple Speech",
-            description: "Uses the native Apple Speech framework for transcription. Requires macOS 26",
-            isMultilingualModel: true,
-            supportedLanguages: getLanguageDictionary(isMultilingual: true, provider: .nativeApple)
+        // Parakeet Models (listed first as recommended for local builds)
+        ParakeetModel(
+            name: "parakeet-tdt-0.6b-v3",
+            displayName: "Parakeet V3",
+            description: "NVIDIA's Parakeet V3 model with multilingual support across English and 25 European languages",
+            size: "494 MB",
+            speed: 0.99,
+            accuracy: 0.94,
+            ramUsage: 0.8,
+            supportedLanguages: getLanguageDictionary(isMultilingual: true, provider: .parakeet)
         ),
-        
-        // Parakeet Models
         ParakeetModel(
             name: "parakeet-tdt-0.6b-v2",
             displayName: "Parakeet V2",
@@ -112,15 +118,14 @@ import Foundation
             ramUsage: 0.8,
             supportedLanguages: getLanguageDictionary(isMultilingual: false, provider: .parakeet)
         ),
-        ParakeetModel(
-            name: "parakeet-tdt-0.6b-v3",
-            displayName: "Parakeet V3",
-            description: "NVIDIA's Parakeet V3 model with multilingual support across English and 25 European languages",
-            size: "494 MB",
-            speed: 0.99,
-            accuracy: 0.94,
-            ramUsage: 0.8,
-            supportedLanguages: getLanguageDictionary(isMultilingual: true, provider: .parakeet)
+
+        // Native Apple Model
+        NativeAppleModel(
+            name: "apple-speech",
+            displayName: "Apple Speech",
+            description: "Uses the native Apple Speech framework for transcription. Requires macOS 26",
+            isMultilingualModel: true,
+            supportedLanguages: getLanguageDictionary(isMultilingual: true, provider: .nativeApple)
         ),
 
          // Local Models

@@ -5,7 +5,9 @@ struct MenuBarView: View {
     @EnvironmentObject var whisperState: WhisperState
     @EnvironmentObject var hotkeyManager: HotkeyManager
     @EnvironmentObject var menuBarManager: MenuBarManager
+    #if !LOCAL_BUILD
     @EnvironmentObject var updaterViewModel: UpdaterViewModel
+    #endif
     @EnvironmentObject var enhancementService: AIEnhancementService
     @EnvironmentObject var aiService: AIService
     @ObservedObject var audioDeviceManager = AudioDeviceManager.shared
@@ -219,12 +221,14 @@ struct MenuBarView: View {
                 }
             
             Divider()
-            
+
+            #if !LOCAL_BUILD
             Button("Check for Updates") {
                 updaterViewModel.checkForUpdates()
             }
             .disabled(!updaterViewModel.canCheckForUpdates)
-            
+            #endif
+
             Button("Help and Support") {
                 EmailSupport.openSupportEmail()
             }
